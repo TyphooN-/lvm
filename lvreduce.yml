@@ -1,0 +1,40 @@
+---
+- name: reduce LV
+  user: root
+  hosts: lvm
+  vars_files:
+    - /vars/lvreduce_vars.yml
+
+  tasks:
+
+    - name: 'Unmounting File system'
+      mount: src='/dev/"{{ item.0 }}"/{{ item.1 }}' state=unmounted
+      with_together:
+        - " {{ vgname }}"
+        - " {{ lvname }}"
+
+    - name: 'Running fsck'
+      command: e2fsck -a /dev/"{{ item.0 }}"/"{{ item.1 }}"
+      with_together:
+        - "{{ vgname }}"
+        - "{{ lvname }}"
+
+    - name: 'Executing resize2fs'
+      command: resize2fs -p /dev/"{{ item.0 }}"/"{{ item.1 }}" "{{ item.2 }}"
+      with_together:
+        - "{{ vgname }}"
+        - "{{ lvname }}"
+        - "{{ lvsize }}"
+
+    - name: 'Reducing Logical Volume'
+      command: lvreduce -L "{{ item.0 }}" /dev/"{{ item.1 }}"/"{{ item.2 }}"
+      with_together:
+        - "{{ lvsize }}"
+        - "{{ vgname }}"
+        - "{{ lvname }}"
+
+    - name: 'Executing resize2fs'
+      command: resize2fs /dev/"{{ item.0 }}"/"{{ item.1 }}"
+      with_together:
+        - "{{ vgname }}"
+        - "{{ lvname }}"

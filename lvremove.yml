@@ -1,0 +1,28 @@
+---
+- name: remove LV
+  user: root
+  hosts: lvm
+  vars_files:
+    - /vars/lvremove_vars.yml
+
+  tasks:
+
+    - name: 'Unmounting Logical Volume'
+      command: umount -f /dev/"{{ item.0 }}"/"{{ item.1 }}"
+      with_together:
+        - "{{ vgname }}"
+        - "{{ lvname }}"
+
+    - name: 'Removing Logical Volume from /etc/fstab'
+      mount: name="{{ item.0 }}" src=/dev/mapper/"{{ vgname }}"-"{{ item.1 }}" fstype="{{ item.2 }}" state=absent
+      with_together:
+        - "{{ mountpoint }}"
+        - "{{ lvname }}"
+        - "{{ fstype }}"
+
+
+    - name: 'Removing Logical Volume from Volume Group'
+      command: lvremove -f /dev/"{{ item.0 }}"/"{{ item.1 }}"
+      with_together:
+        - "{{ vgname }}"
+        - "{{ lvname }}"

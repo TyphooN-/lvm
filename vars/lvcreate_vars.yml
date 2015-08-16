@@ -1,0 +1,10 @@
+---
+vgname: storage
+lvname:
+  - music
+lvsize:
+  - 200G
+mountpoint:
+  - /music
+fstype:
+  - ext4

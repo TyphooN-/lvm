@@ -1,0 +1,7 @@
+---
+vgname:
+  - vg0
+lvname:
+  - comlog_v2
+mountpoint:
+  - /db/p/comlog/v2
