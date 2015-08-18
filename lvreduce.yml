@@ -3,18 +3,19 @@
   user: root
   hosts: lvm
   vars_files:
-    - /vars/lvreduce_vars.yml
+    - lvreduce_vars.yml
 
   tasks:
 
-    - name: 'Unmounting File system'
-      mount: src='/dev/"{{ item.0 }}"/{{ item.1 }}' state=unmounted
+    - name: 'Unmounting Logical Volume'
+      command: umount -f /dev/"{{ item.0 }}"/"{{ item.1 }}"
       with_together:
-        - " {{ vgname }}"
-        - " {{ lvname }}"
+        - "{{ vgname }}"
+        - "{{ lvname }}"
+      ignore_errors: yes
 
     - name: 'Running fsck'
-      command: e2fsck -a /dev/"{{ item.0 }}"/"{{ item.1 }}"
+      shell: e2fsck -f -a /dev/"{{ item.0 }}"/"{{ item.1 }}"
       with_together:
         - "{{ vgname }}"
         - "{{ lvname }}"
