@@ -3,11 +3,11 @@
   user: root
   hosts: lvm
   vars_files:
-    - /vars/lvresize_vars.yml
+    - lvresize_vars.yml
 
   tasks:
-  
-      - name: 'Unmounting Logical Volume'
+
+    - name: 'Unmounting Logical Volume'
       command: umount -f /dev/"{{ item.0 }}"/"{{ item.1 }}"
       with_together:
         - "{{ vgname }}"
@@ -20,11 +20,10 @@
         - "{{ lvsize }}"
         - "{{ vgname }}"
         - "{{ lvname }}"
-        
-    - name: 'Resizing Logical Volume'
-      command: lvresize -L "{{ item.0 }}" /dev/"{{ item.1 }}"/"{{ item.2 }}"
+
+    - name: 'Running fsck -p on device before resizing.'
+      command: fsck -f -a /dev/"{{ item.1 }}"/"{{ item.2 }}"
       with_together:
-        - "{{ lvsize }}"
         - "{{ vgname }}"
         - "{{ lvname }}"
 
