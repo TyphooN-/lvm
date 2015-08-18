@@ -3,7 +3,7 @@
   user: root
   hosts: lvm
   vars_files:
-    - lvreduce_vars.yml
+    - vars/lvreduce_vars.yml
 
   tasks:
 
