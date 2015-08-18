@@ -15,7 +15,7 @@
       ignore_errors: yes
 
     - name: 'Running fsck'
-      shell: e2fsck -f -a /dev/"{{ item.0 }}"/"{{ item.1 }}"
+      shell: fsck -f -a /dev/"{{ item.0 }}"/"{{ item.1 }}"
       with_together:
         - "{{ vgname }}"
         - "{{ lvname }}"
