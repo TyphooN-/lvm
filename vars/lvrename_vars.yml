@@ -1,0 +1,10 @@
+---
+vgname: storage
+oldlvname:
+  - music
+newlvname:
+  - movies
+mountpoint:
+  - /music
+fstype:
+  - ext4
