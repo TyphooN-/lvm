@@ -1,0 +1,32 @@
+---
+- name: rename LV
+  user: root
+  hosts: lvm
+  vars_files:
+    - vars/lvrename_vars.yml
+
+  tasks:
+
+    - name: 'Unmounting Logical Volume'
+      command: umount -f /dev/"{{ item.0 }}"/"{{ item.1 }}"
+      with_together:
+        - "{{ vgname }}"
+        - "{{ oldlvname }}"
+      ignore_errors: yes
+
+    - name: 'Renaming Logical Volume'
+      command: lvrename  "{{ item.0 }}" /dev/"{{ item.0 }}"/"{{ item.1 }}" /dev/"{{ item.0 }}"/"{{ item.2 }}"
+      with_together:
+        - "{{ vgname }}"
+        - "{{ oldlvname }}"
+        - "{{ newlvname }}"
+
+    - name: 'Remove old fstab entry'
+      lineinfile: dest=/etc/fstab state=absent regexp="^{{ oldlvname }}"
+
+    - name: 'Mount the new filesystem and add to /etc/fstab'
+      mount: name="{{ item.0 }}" src=/dev/mapper/"{{ vgname }}"-"{{ item.1 }}" fstype="{{ item.2 }}" state=mounted
+      with_together:
+        - "{{ mountpoint }}"
+        - "{{ newlvname }}"
+        - "{{ fstype }}"
